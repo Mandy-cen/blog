@@ -1,27 +1,157 @@
-# Vue3 diff算法图解分析
+# vue3.0 diff算法
 
-该技术文章来自：https://www.mdnice.com/writing/7fdcd957224f49d586c73568797b806e
+标签（空格分隔）： vue
 
-diff的主要过程，核心逻辑
-diff是如何进行节点复用、移动、卸载
-并有一个示例题，可以结合本文进行练习分析
-如果你还不是特别了解Vnode、渲染器的patch流程，建议先阅读下面两篇文章：
+---
+#### diff痛点
+vue2.x中的虚拟dom是进行「全量的对比」，在运行时会对所有节点生成一个虚拟节点树，当页面数据发生变更好，会遍历判断virtual dom所有节点（包括一些不会变化的节点）有没有发生变化；虽然说diff算法确实减少了多DOM节点的直接操作，但是这个「减少是有成本的」，如果是复杂的大型项目，必然存在很复杂的父子关系的VNode,「而Vue2.x的diff算法，会不断地递归调用 patchVNode，不断堆叠而成的几毫秒，最终就会造成 VNode 更新缓慢」。
 
-- Vnode
-- 渲染器分析
+那么Vue3.0是如何解决这些问题的呢？
+
+vue3在diff算法中相比vue2增加了静态标记
+
+关于这个静态标记，其作用是为了会发生变化的地方添加一个flag标记，下次发生变化的时候直接找该地方进行比较
+
+下图这里，已经标记静态节点的p标签在diff过程中则不会比较，把性能进一步提高
+![此处输入图片的描述][1]
+
+这里介绍一个小工具：https://vue-next-template-explorer.netlify.app/
+
+关于静态类型枚举如下
+```
+export const enum PatchFlags {
+  TEXT = 1,// 动态的文本节点
+  CLASS = 1 << 1,  // 2 动态的 class
+  STYLE = 1 << 2,  // 4 动态的 style
+  PROPS = 1 << 3,  // 8 动态属性，不包括类名和样式
+  FULL_PROPS = 1 << 4,  // 16 动态 key，当 key 变化时需要完整的 diff 算法做比较
+  HYDRATE_EVENTS = 1 << 5,  // 32 表示带有事件监听器的节点
+  STABLE_FRAGMENT = 1 << 6,   // 64 一个不会改变子节点顺序的 Fragment
+  KEYED_FRAGMENT = 1 << 7, // 128 带有 key 属性的 Fragment
+  UNKEYED_FRAGMENT = 1 << 8, // 256 子节点没有 key 的 Fragment
+  NEED_PATCH = 1 << 9,   // 512
+  DYNAMIC_SLOTS = 1 << 10,  // 动态 solt
+  HOISTED = -1,  // 特殊标志是负整数表示永远不会用作 diff
+  BAIL = -2 // 一个特殊的标志，指代差异算法
+}
+```
+## 静态提升
+「 Vue3.0对于不参与更新的元素，做静态标记并提示，只会被创建一次，在渲染时直接复用。」
+
+这样就免去了重复的创建节点，大型应用会受益于这个改动，免去了重复的创建操作，优化了运行时候的内存占用
+
+```
+<div>
+  <span>Hello World</span>
+  <span >{{msg}}</span>
+</div>
+```
+没有做静态提升之前
+
+```
+export function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createElementBlock("div", null, [
+    _createElementVNode("span", null, "Hello World"),
+    _createElementVNode("span", null, _toDisplayString(_ctx.msg), 1 /* TEXT */)
+  ]))
+}
+```
+做了静态提升之后
+
+```
+const _hoisted_1 = /*#__PURE__*/_createElementVNode("span", null, "Hello World", -1 /* HOISTED */)
+
+export function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createElementBlock("div", null, [
+    _hoisted_1,
+    _createElementVNode("span", null, _toDisplayString(_ctx.msg), 1 /* TEXT */)
+  ]))
+}
+```
+
+静态内容_hoisted_1被放置在render 函数外，每次渲染的时候只要取 _hoisted_1 即可
+
+同时 _hoisted_1 被打上了 PatchFlag ，静态标记值为 -1 ，特殊标志是负整数表示永远不会用于 Diff
+
+## 事件监听缓存
+默认情况下绑定事件行为会被视为动态绑定，所以每次都会去追踪它的变化
+
+```
+<div>
+  <button @click = 'onClick'>点我</button>
+</div>
+```
+没开启事件监听器缓存
+
+```
+export const render = /*#__PURE__*/_withId(function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createBlock("div", null, [
+    _createVNode("button", { onClick: _ctx.onClick }, "点我", 8 /* PROPS */, ["onClick"])
+// PROPS=1<<3,// 8 //动态属性，但不包含类名和样式
+  ]))
+})
+```
+开启事件侦听器缓存后
+
+```
+export function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createBlock("div", null, [
+    _createVNode("button", {
+      onClick: _cache[1] || (_cache[1] = (...args) => (_ctx.onClick(...args)))
+    }, "点我")
+  ]))
+}
+```
+上述发现开启了缓存后，没有了静态标记。也就是说下次diff算法的时候直接使用
+
+## SSR优化
+当静态内容大到一定量级时候，会用createStaticVNode方法在客户端去生成一个static node，这些静态node，会被直接innerHtml，就不需要创建对象，然后根据对象渲染
+
+```
+div>
+	<div>
+		<span>你好</span>
+	</div>
+	...  // 很多个静态属性
+	<div>
+		<span>{{ message }}</span>
+	</div>
+</div>
+```
+编译后
+
+```
+import { mergeProps as _mergeProps } from "vue"
+import { ssrRenderAttrs as _ssrRenderAttrs, ssrInterpolate as _ssrInterpolate } from "@vue/server-renderer"
+
+export function ssrRender(_ctx, _push, _parent, _attrs, $props, $setup, $data, $options) {
+  const _cssVars = { style: { color: _ctx.color }}
+  _push(`<div${
+    _ssrRenderAttrs(_mergeProps(_attrs, _cssVars))
+  }><div><span>你好</span>...<div><span>你好</span><div><span>${
+    _ssrInterpolate(_ctx.message)
+  }</span></div></div>`)
+}
+```
+
+## vue3 diff算法解析：
+
+> vue2 核心 diff 算法 采用的是双端比较算法
+> vue3 核心 diff 算法采用的是去头尾的最长递增子序列算法
+
 
 ## 1.0 diff无key子节点
 在处理被标记为`UNKEYED_FRAGMENT`时。
 
- - 首先会通过新旧子序列获取最小共同长度`commonLength`。
+- 首先会通过新旧子序列获取最小共同长度`commonLength`。
 
- - 对公共部分循环遍历patch。
+- 对公共部分循环遍历`patch`。
 
- - patch 结束，再处理剩余的新旧节点。
+- `patch` 结束，再处理剩余的新旧节点。
 
- - 如果oldLength > newLength，说明需要对旧节点进行unmount
+- 如果`oldLength > newLength`，说明需要对旧节点进行`unmount`
 
- - 否则，说明有新增节点，需要进行mount;
+- 否则，说明有新增节点，需要进行`mount`;
 
 ![无key子序列](./img/1.png)
 
@@ -55,22 +185,22 @@ const patchUnkeyedChildren = (c1, c2,...res) => {
 
 从上面的代码可以看出，在处理无`key`子节点的时候，逻辑还是非常简单粗暴的。准确的说处理无`key`子节点的效率并不高。
 
-因为不管是直接对公共部分patch，还是直接对新增节点进行`mountChildren`（其实是遍历子节点，进行patch操作），其实都是在递归进行patch，这就会影响到性能。
+因为不管是直接对公共部分`patch`，还是直接对新增节点进行`mountChildren`（其实是遍历子节点，进行`patch`操作），其实都是在递归进行`patch`，这就会影响到性能。
 
 ## 2.0 diff有key子节点序列
-在diff有key子序列的时候，会进行细分处理。主要会经过以下一种情况的判断：
+在`diff`有`key`子序列的时候，会进行细分处理。主要会经过以下一种情况的判断：
 
- - 起始位置节点类型相同。
- - 结束位置节点类型相同。
- - 相同部分处理完，有新增节点。
- - 相同部分处理完，有旧节点需要卸载。
- - 首尾相同，但中间部分存在可复用乱序节点。
+- 起始位置节点类型相同。
+- 结束位置节点类型相同。
+- 相同部分处理完，有新增节点。
+- 相同部分处理完，有旧节点需要卸载。
+- 首尾相同，但中间部分存在可复用乱序节点。
 
 在开始阶段，会先生面三个指正，分别是:
 
 `i = 0`，指向新旧序列的开始位置
 `e1 = oldLength - 1`，指向旧序列的结束位置
-`e2 = newLength - 1，指向新序列的结束位置
+`e2 = newLength - 1`，指向新序列的结束位置
 ![有key子序列](./img/2.png)
 
 ```javascript
@@ -84,11 +214,11 @@ let e2 = l2 - 1 // next ending index
 ### 2.1 起始位置节点类型相同
 ![起始位置](./img/3.png)
 
- - 对于起始位置类型相同的节点，从左向右进行diff遍历。
+- 对于起始位置类型相同的节点，从左向右进行`diff`遍历。
 
- - 如果新旧节点类型相同，则进行patch处理
+- 如果新旧节点类型相同，则进行`patch`处理
 
- - 节点类型不同，则break，跳出遍历diff
+- 节点类型不同，则`break`，跳出遍历`diff`
 
 ```javascript
 //  i <= 2 && i <= 3
@@ -112,14 +242,14 @@ while (i <= e1 && i <= e2) {
 
 保证能充分遍历到开始位置相同的位置，`i <= e1 && i <= e2 `。
 
-一旦遇到类型不同的节点，就会跳出diff遍历。
+一旦遇到类型不同的节点，就会跳出`diff`遍历。
 
 ### 2.2 结束位置节点类型相同
 ![结束位置相同](./img/4.png)
 
-开始位置相同diff 结束，会紧接着从序列尾部开始遍历 diff。
+开始位置相同`diff`结束，会紧接着从序列尾部开始遍历`diff`。
 
-此时需要对尾指针e1、e2进行递减。
+此时需要对尾指针`e1`、`e2`进行递减。
 
 ```javascript
 //  i <= 2 && i <= 3
@@ -138,14 +268,14 @@ while (i <= e1 && i <= e2) {
   e2--
 }
 ```
-从代码可以看出，diff逻辑与第一种基本一样，相同类型进行patch处理。
+从代码可以看出，`diff`逻辑与第一种基本一样，相同类型进行`patch`处理。
 
-不同类型break，跳出循环遍历。
+不同类型`break`，跳出循环遍历。
 
 并且对尾指针进行递减操作。
 
 ### 2.3 相同部分遍历结束，新序列中有新增节点，进行挂载
-经过上面两种情况的处理，已经patch完首尾相同部分的节点，接下来是对新序列中的新增节点进行patch处理。
+经过上面两种情况的处理，已经`patch`完首尾相同部分的节点，接下来是对新序列中的新增节点进行`patch`处理。
 
 ![挂载新增节点](./img/5.png)
 
@@ -153,7 +283,7 @@ while (i <= e1 && i <= e2) {
 
 这种情况下意味着新的子节点序列中有新增节点。
 
-这时会对新增节点进行patch。
+这时会对新增节点进行`patch`。
 
 ```javascript
 // 3. common sequence + mount
@@ -176,21 +306,19 @@ if (i > e1) {
   }
 }
 ```
-从上面的代码可以知道，patch的时候没有传第一个参数，最终会走mount的逻辑。
+从上面的代码可以知道，`patch`的时候没有传第一个参数，最终会走`mount`的逻辑。
 
-❝
-可以看这篇主要分析patch: https://mp.weixin.qq.com/s/hzpNGWFCLMC2vJNSmP2vsQ的过程 ❞
 
-在patch的过程中，会递增i指针。
+在`patch`的过程中，会递增i指针。
 
 并通过`nextPos`来获取锚点。
 
-如果`nextPos < l2`，则以已经patch的节点作为锚点，否则以父节点作为锚点。
+如果`nextPos < l2`，则以已经`patch`的节点作为锚点，否则以父节点作为锚点。
 
 ### 2.4 相同部分遍历结束，新序列中少节点，进行卸载
 ![卸载旧节点](./img/6.png)
 
-如果处理完收尾相同的节点，出现i > e2 && i <= e1的情况，则意味着有旧节点需要进行卸载操作。
+如果处理完收尾相同的节点，出现`i > e2 && i <= e1`的情况，则意味着有旧节点需要进行卸载操作。
 
 ```javascript
 // 4. common sequence + unmount
@@ -212,7 +340,7 @@ else if (i > e2) {
 通过代码可以知道，这种情况下，会递增i指针，对旧节点进行卸载。
 
 ### 2.5 乱序情况
-这种情况下较为复杂，但diff的核心逻辑在于通过新旧节点的位置变化构建一个最大递增子序列，最大子序列能保证通过最小的移动或者patch实现节点的复用。
+这种情况下较为复杂，但`diff`的核心逻辑在于通过新旧节点的位置变化构建一个最大递增子序列，最大子序列能保证通过最小的移动或者`patch`实现节点的复用。
 
 下面一起来看下如何实现的。
 ![中间乱序，但有可复用节点](./img/7.png)
@@ -252,9 +380,9 @@ for (i = s2; i <= e2; i++) {
 
 在经过首尾相同的patch处理之后，`i = 2，e1 = 4，e2 = 5`
 
-经过遍历之后`keyToNewIndexMap`中，新节点的key:index的关系为 `E : 2、D : 3 、C : 4、H : 5`
+经过遍历之后`keyToNewIndexMap`中，新节点的`key:index`的关系为 `E : 2、D : 3 、C : 4、H : 5`
 
-keyToNewIndexMap的作用主要是后面通过遍历旧子序列，确定可复用节点在新的子序列中的位置
+`keyToNewIndexMap`的作用主要是后面通过遍历旧子序列，确定可复用节点在新的子序列中的位置
 
 #### 2.5.2 从左向右遍历旧子序列，patch匹配的相同类型的节点，移除不存在的节点
 经过前面的处理，已经创建了`keyToNewIndexMap`。
@@ -297,21 +425,21 @@ const newIndexToOldIndexMap = new Array(toBePatched)
 for (i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0
 ```
 
- - 变量 patched 用于记录已经patch的节点
- - 变量 toBePatched 用于记录需要进行patch的节点个数
- - 变量 moved 用于记录是否有可复用节点发生交叉
- - maxNewIndexSoFar用于记录当旧的子序列中存在没有设置key的子节点，但是该子节点出现于新的子序列中，且可复用，最大下标。
- - 变量newIndexToOldIndexMap用于映射「新的子序列中的节点下标」 对应于 「旧的子序列中的节点的下标」
- - 并且会将newIndexToOldIndexMap初始化为一个全0数组，[0, 0, 0, 0]
+- 变量 `patched` 用于记录已经`patch`的节点
+- 变量 `toBePatched` 用于记录需要进行`patch`的节点个数
+- 变量 `moved` 用于记录是否有可复用节点发生交叉
+- `maxNewIndexSoFar`用于记录当旧的子序列中存在没有设置`key`的子节点，但是该子节点出现于新的子序列中，且可复用，最大下标。
+- 变量`newIndexToOldIndexMap`用于映射「新的子序列中的节点下标」 对应于 「旧的子序列中的节点的下标」
+- 并且会将`newIndexToOldIndexMap`初始化为一个全0数组，[0, 0, 0, 0]
 
 
 ![可复用交叉节点](./img/9.png)
 
 知道了这些变量的含义之后 我们就可以开始从左向右遍历子序列了。
 
-遍历的时候，需要首先遍历旧子序列，起点是s1，终点是e1。
+遍历的时候，需要首先遍历旧子序列，起点是`s1`，终点是`e1`。
 
-遍历的过程中会对patched进行累加。
+遍历的过程中会对`patched`进行累加。
 
 ### 卸载旧节点
 如果`patched >= toBePatched`，说明新子序列中的子节点少于旧子序列中的节点数量。
@@ -336,7 +464,7 @@ for (i = s1; i <= e1; i++) {
     }
 }
 ```
-如果`prevChild.key`是存在的，会通过前面我们构建的`keyToNewIndexMap`，获取prevChild在新子序列中的下标newIndex。
+如果`prevChild.key`是存在的，会通过前面我们构建的`keyToNewIndexMap`，获取`prevChild`在新子序列中的下标`newIndex`。
 
 ### 获取newIndex
 ```javascript
@@ -358,11 +486,11 @@ if (prevChild.key != null) {
   newIndex = keyToNewIndexMap.get(prevChild.key)
 }
 ```
-以图为例，可以知道，在遍历过程中，节点c、d、e为可复用节点，分别对应新子序列中的2、3、4的位置。
+以图为例，可以知道，在遍历过程中，节点`c、d、e`为可复用节点，分别对应新子序列中的`2、3、4`的位置。
 
-故newIndex可以取到的值为4、3、2。
+故newIndex可以取到的值为`4、3、2`。
 
-如果旧节点没有key怎么办？
+如果旧节点没有`key`怎么办？
 
 ```javascript
 // key-less node, try to locate a key-less node of the same type
@@ -381,11 +509,11 @@ for (j = s2; j <= e2; j++) {
   }
 }
 ```
-如果节点没有key，则同样会取新子序列中，遍历查找没有key且两个新旧类型相同子节点，并以此节点的下标，作为newIndex。
+如果节点没有`key`，则同样会取新子序列中，遍历查找没有`key`且两个新旧类型相同子节点，并以此节点的下标，作为`newIndex`。
 
->newIndexToOldIndexMap[j - s2] === 0 说明节点没有该节点没有key。
+> newIndexToOldIndexMap[j - s2] === 0 说明节点没有该节点没有key。
 
-如果还没有获取到newIndex，说明在新子序列中没有存在的与 prevChild 相同的子节点，需要对prevChild进行卸载。
+如果还没有获取到`newIndex`，说明在新子序列中没有存在的与 `prevChild` 相同的子节点，需要对`prevChild`进行卸载。
 
 ```javascript
 if (newIndex === undefined) {
@@ -393,8 +521,8 @@ if (newIndex === undefined) {
   unmount(prevChild, parentComponent, parentSuspense, true)
 }
 ```
-否则，开始根据newIndex，构建keyToNewIndexMap，明确新旧节点对应的下标位置。
->时刻牢记newIndex是根据旧节点获取的其在新的子序列中的下标。
+否则，开始根据`newIndex`，构建`keyToNewIndexMap`，明确新旧节点对应的下标位置。
+> 时刻牢记`newIndex`是根据旧节点获取的其在新的子序列中的下标。
 
 ```javascript
 // 这里处理获取到newIndex的情况
@@ -424,17 +552,17 @@ if (newIndex >= maxNewIndexSoFar) {
 ```
 
 
-在构建`newIndexToOldIndexMa`p的同时，会通过判断`newIndex`、`maxNewIndexSoFa`的关系，确定节点是否发生移动。
+在构建`newIndexToOldIndexMap`的同时，会通过判断`newIndex`、`maxNewIndexSoFa`的关系，确定节点是否发生移动。
 
-`newIndexToOldIndexMap`最后遍历结束应该为[5, 4, 3, 0]，0说明有旧序列中没有与心序列中对应的节点，并且该节点可能是新增节点。
+`newIndexToOldIndexMap`最后遍历结束应该为`[5, 4, 3, 0]`，0说明有旧序列中没有与心序列中对应的节点，并且该节点可能是新增节点。
 
-如果新旧节点在序列中相对位置保持始终不变，则maxNewIndexSoFar会随着newIndex的递增而递增。
+如果新旧节点在序列中相对位置保持始终不变，则`maxNewIndexSoFar`会随着`newIndex`的递增而递增。
 
 意味着节点没有发生交叉。也就不需要移动可复用节点。
 
-否则可复用节点发生了移动，需要对可复用节点进行move。
+否则可复用节点发生了移动，需要对可复用节点进行`move`。
 
-遍历的最后，会对新旧节点进行patch，并对patched进行累加，记录已经处理过几个节点。
+遍历的最后，会对新旧节点进行`patch`，并对`patched`进行累加，记录已经处理过几个节点。
 
 ```javascript
 // 进行递归patch
@@ -460,7 +588,7 @@ patched++
 ```
 
 
-经过上面的处理，已经完成对旧节点进行了卸载，对相对位置保持没有变化的子节点进行了patch复用。
+经过上面的处理，已经完成对旧节点进行了卸载，对相对位置保持没有变化的子节点进行了`patch`复用。
 
 接下来就是需要移动可复用节点，挂载新子序列中新增节点。
 
@@ -469,26 +597,26 @@ patched++
 
 前面通过`newIndexToOldIndexMap`，记录了新旧子节点变化前后的下标映射。
 
-这里会通过getSequence方法获取一个最大递增子序列。用于记录相对位置没有发生变化的子节点的下标。
+这里会通过`getSequence`方法获取一个最大递增子序列。用于记录相对位置没有发生变化的子节点的下标。
 
 根据此递增子序列，可以实现在移动可复用节点的时候，只移动相对位置前后发生变化的子节点。
 
 做到最小改动。
 
 ### 那什么是最大递增子序列？
- - 子序列是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。
- - 而递增子序列，是数组派生的子序列，各元素之间保持逐个递增的关系。
-例如：
- - 数组[3, 6, 2, 7] 是数组 [0, 3, 1, 6, 2, 2, 7] 的最长严格递增子序列。
- - 数组[2, 3, 7, 101] 是数组 [10 , 9, 2, 5, 3, 7, 101, 18]的最大递增子序列。
- - 数组[0, 1, 2, 3] 是数组 [0, 1, 0, 3, 2, 3]的最大递增子序列。
+- 子序列是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。
+- 而递增子序列，是数组派生的子序列，各元素之间保持逐个递增的关系。
+  例如：
+- 数组`[3, 6, 2, 7]` 是数组 `[0, 3, 1, 6, 2, 2, 7]` 的最长严格递增子序列。
+- 数组`[2, 3, 7, 101]` 是数组` [10 , 9, 2, 5, 3, 7, 101, 18]`的最大递增子序列。
+- 数组`[0, 1, 2, 3] `是数组 `[0, 1, 0, 3, 2, 3]`的最大递增子序列。
 
 ![最大递增子序列](./img/10.png)
 
 
-已上图为例，在未处理的乱序节点中，存在新增节点N、I、需要卸载的节点G，及可复用节点C、D、E、F。
+已上图为例，在未处理的乱序节点中，存在新增节点`N、I`、需要卸载的节点`G`，及可复用节点`C、D、E、F`。
 
-节点CDE在新旧子序列中相对位置没有变换，如果想要通过最小变动实现节点复用，我们可以将找出F节点变化前后的下标位置，在新的子序列C节点之前插入F节点即可。
+节点`C、D、E`在新旧子序列中相对位置没有变换，如果想要通过最小变动实现节点复用，我们可以将找出`F`节点变化前后的下标位置，在新的子序列`C`节点之前插入`F`节点即可。
 
 最大递增子序列的作用就是通过新旧节点变化前后的映射，创建一个递增数组，这样就可以知道哪些节点在变化前后相对位置没有发生变化，哪些节点需要进行移动。
 
@@ -548,15 +676,15 @@ for (i = toBePatched - 1; i >= 0; i--) {
 ![最大递增子序列](./img/11.png)
 
 
-从右向左patch节点从上面的代码可以知道：
+从右向左`patch`节点从上面的代码可以知道：
 
- - 通过`newIndexToOldIndexMap`获取的最大递增子序列是[2]
- - j = 0
- - 遍历的时候从右向左遍历，这样可以获取到锚点，如果有已经经过patch的兄弟节点，则以兄弟节点作为锚点，否则以父节点作为锚点
- - `newIndexToOldIndexMap[i] === 0`，说明是新增节点。需要对节点进行mount，这时只需给patch的第一个参数传null即可。可以知道首先会对h节点进行patch。
- - 否则会判断moved是否为true。通过前面的分析，我们知道节点C & 节点E在前后变化中发生了位置移动。
- - 故这里会移动节点，我们知道 「j」 此时为0，「i」 此时为**2**，i !== increasingNewIndexSequence[j]为 true，并不会移动C节点，而是执行 j--。
- - 后面因为 j < 0，会对 D、E节点进行移动。
+- 通过`newIndexToOldIndexMap`获取的最大递增子序列是`[2]`
+- `j = 0`
+- 遍历的时候从右向左遍历，这样可以获取到锚点，如果有已经经过`patch`的兄弟节点，则以兄弟节点作为锚点，否则以父节点作为锚点
+- `newIndexToOldIndexMap[i]===0`，说明是新增节点。需要对节点进行`mount`，这时只需给`patch`的第一个参数传`null`即可。可以知道首先会对`h`节点进行`patch`。
+- 否则会判断`moved`是否为`true`。通过前面的分析，我们知道节点C & 节点E在前后变化中发生了位置移动。
+- 故这里会移动节点，我们知道 「j」 此时为0，「i」 此时为**2**，`i !== increasingNewIndexSequence[j]`为 true，并不会移动`C`节点，而是执行 `j--`。
+- 后面因为 `j < 0`，会对 `D、E`节点进行移动。
 
 至此我们就完成了Vue3 diff算法的学习分析。
 
@@ -573,8 +701,14 @@ for (i = toBePatched - 1; i >= 0; i--) {
 
 
 ## 总结
-通过上面的学习分析，可以知道，Vue3 的diff算法，会首先进行收尾相同节点的patch处理，结束后，会挂载新增节点，卸载旧节点。
+通过上面的学习分析，可以知道，Vue3 的diff算法，会首先进行收尾相同节点的`patch`处理，结束后，会挂载新增节点，卸载旧节点。
 
-如果子序列的情况较为复杂，比如出现乱序的情况，则会首先找出可复用的节点，并通过可复用节点的位置映射构建一个最大递增子序列，通过最大递增子序列来对节点进行mount & move。以提高diff效率，实现节点复用的最大可能性。
+如果子序列的情况较为复杂，比如出现乱序的情况，则会首先找出可复用的节点，并通过可复用节点的位置映射构建一个最大递增子序列，通过最大递增子序列来对节点进行`mount & move`。以提高`diff`效率，实现节点复用的最大可能性。
 
 ![总结](./img/15.webp)
+
+
+这里分享一个写的比较好的文章：https://www.mdnice.com/writing/7fdcd957224f49d586c73568797b806e
+
+
+[1]: https://static.vue-js.com/c732e150-5c58-11eb-ab90-d9ae814b240d.png
