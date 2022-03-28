@@ -134,11 +134,13 @@ export function ssrRender(_ctx, _push, _parent, _attrs, $props, $setup, $data, $
 }
 ```
 
-## vue3 diff算法解析：
+## vue3 diff算法解析
 
 > vue2 核心 diff 算法 采用的是双端比较算法
+> 
 > vue3 核心 diff 算法采用的是去头尾的最长递增子序列算法
 
+源码地址：https://github.com/vuejs/core/blob/main/packages/runtime-core/src/renderer.ts
 
 ## 1.0 diff无key子节点
 在处理被标记为`UNKEYED_FRAGMENT`时。
