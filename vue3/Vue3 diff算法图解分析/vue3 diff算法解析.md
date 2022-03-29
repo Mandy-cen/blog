@@ -227,6 +227,7 @@ let e2 = l2 - 1 // next ending index
 - 节点类型不同，则`break`，跳出遍历`diff`
 
 ```javascript
+//  patchKeyedChildren
 //  i <= 2 && i <= 3
 while (i <= e1 && i <= e2) {
   const n1 = c1[i]
