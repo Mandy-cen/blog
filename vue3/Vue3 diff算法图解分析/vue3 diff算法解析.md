@@ -724,7 +724,7 @@ for (i = toBePatched - 1; i >= 0; i--) {
 ![总结](./img/15.webp)
 
 
-这里分享一个写的比较好的文章：https://www.mdnice.com/writing/7fdcd957224f49d586c73568797b806e
+文章部门内容来自：https://www.mdnice.com/writing/7fdcd957224f49d586c73568797b806e
 
 
 [1]: https://static.vue-js.com/c732e150-5c58-11eb-ab90-d9ae814b240d.png
