@@ -201,7 +201,9 @@ const patchUnkeyedChildren = (c1, c2,...res) => {
 在开始阶段，会先声明三个指针，分别是:
 
 `i = 0`，指向新旧序列的开始位置
+
 `e1 = oldLength - 1`，指向旧序列的结束位置
+
 `e2 = newLength - 1`，指向新序列的结束位置
 
 ![有key子序列](./img/2.png)
