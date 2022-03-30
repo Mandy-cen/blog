@@ -14,7 +14,6 @@ vue3在diff算法中相比vue2增加了静态标记
 下图这里，已经标记静态节点的p标签在diff过程中则不会比较，把性能进一步提高
 ![此处输入图片的描述][1]
 
-这里介绍一个小工具：https://vue-next-template-explorer.netlify.app/
 
 关于静态类型枚举如下
 ```
@@ -132,6 +131,9 @@ export function ssrRender(_ctx, _push, _parent, _attrs, $props, $setup, $data, $
   }</span></div></div>`)
 }
 ```
+
+
+这里介绍一个小工具：https://vue-next-template-explorer.netlify.app/
 
 ## vue3 diff算法解析
 
