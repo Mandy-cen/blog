@@ -109,10 +109,10 @@ try {
 同时我们还可以发现，在改变promise状态时调用resolve和reject函数的时候，也可以给下一步then种执行的函数传递参数。这个例子中我们把随机生成的数字传给了resolve和reject函数，我们也就能在then中执行函数的时候拿到这个值。
 
 总结一下本小姐的内容：
-> 1. promise 会有三种状态，「进行中」「已完成」和「已拒绝」，进行中状态可以更改为已完成或已拒绝，已经更改过状态后无法继续更改（例如从已完成改为已拒绝状态）。
-> 2. ES6 中的Promise构造函数，我们构造之后需要传入一个函数，他接受两个函数参数，执行第一个参数之后就会改变当前Promise为「已完成」状态，执行第二个参数之后就会变为「已拒绝」状态。
-> 3. 通过.then方法，即可在上一个promise达到已完成时继续执行下一个函数promise。同时通过resolve或reject时传入参数，即可给下一个函数或promise传入初始化。
-> 4. 已拒绝的promise， 后续可以通过 .catch 方法或事.then方法的第二个参数或事 try catch 进行捕获。
+- promise 会有三种状态，「进行中」「已完成」和「已拒绝」，进行中状态可以更改为已完成或已拒绝，已经更改过状态后无法继续更改（例如从已完成改为已拒绝状态）。
+- ES6 中的Promise构造函数，我们构造之后需要传入一个函数，他接受两个函数参数，执行第一个参数之后就会改变当前Promise为「已完成」状态，执行第二个参数之后就会变为「已拒绝」状态。
+- 通过.then方法，即可在上一个promise达到已完成时继续执行下一个函数promise。同时通过resolve或reject时传入参数，即可给下一个函数或promise传入初始化。
+- 已拒绝的promise， 后续可以通过 .catch 方法或事.then方法的第二个参数或事 try catch 进行捕获。
 
 ## 如何封装异步操作为promise
 
@@ -198,8 +198,8 @@ ajax('/url').catch(function(){console.log('fail')}.then(function(){console.log('
 ```
 
 总结一下当前小结：
-> 1. 我们可以轻松的把任何一个函数或者是异步函数改为promise，尤其是异步函数，改为promise 之后即可进行链式调用，增强可读性。
-> 2. 将带有回调函数的异步改为promise也很简单，只需在内部实例化promise 之后，在原来执行回调函数的地方执行对应的更改promise状态函数即可。
+- 我们可以轻松的把任何一个函数或者是异步函数改为promise，尤其是异步函数，改为promise 之后即可进行链式调用，增强可读性。
+- 将带有回调函数的异步改为promise也很简单，只需在内部实例化promise 之后，在原来执行回调函数的地方执行对应的更改promise状态函数即可。
 
 ## Promise 规范解读
 任何符合promise 规范的对象或函数都可以成为promise，promise A plus规范地址：https://promiseaplus.com/
@@ -218,35 +218,35 @@ Promise：promise是一个拥有 `then`方法的对象或函数，其行为符�
 #### promise 的状态
 
 一个Promise的当前状态必须为一下三种状态中的一种：`等待中（Pending）`、`已完成（Fulfiled）`和`已拒绝（Rejected）`.
-> 处于等待中时，promise需满足以下条件：可以变为「已完成」或「已拒绝」
-> 处于已完成时，promise需满足以下条件：1.不能迁移至其他任何状态；2.必须拥有一个不可变的值
-> 处于已拒绝时，promise需满足以下条件：1.不能迁移至其他任何状态；2.必须拥有一个不可变的原因
+- 处于等待中时，promise需满足以下条件：可以变为「已完成」或「已拒绝」
+- 处于已完成时，promise需满足以下条件：1.不能迁移至其他任何状态；2.必须拥有一个不可变的值
+- 处于已拒绝时，promise需满足以下条件：1.不能迁移至其他任何状态；2.必须拥有一个不可变的原因
 
 #### 必须有一个then方法
 
 一个promise必须提供一个 `then`方法以访问其当前值和原因。
 promise的then方法接收两个参数：`promise.then(onFulfilled,onRejected)` 他们都是可选参数，同属他们都是函数，如果 `onFulfilled`或`onRejected`不是函数，则需要忽略他们。
-> 如果 `onFulfilled` 是一个函数
- >> 当 `promise` 执行结束后其必须被调用，其第一个参数为 `promise` 的结果
- >> 在 `promise`执行结束前其不可被调用
- >> 其调用次数不可超过一次
+- 如果 `onFulfilled` 是一个函数
+  - 当 `promise` 执行结束后其必须被调用，其第一个参数为 `promise` 的结果
+  - 在 `promise`执行结束前其不可被调用
+  - 其调用次数不可超过一次
 
-> 如果 `onRejected` 是一个函数
- >> 当 `promise` 被拒绝执行后其必须被调用，其第一个参数为`promise`的原因
- >> 当`promise`被拒绝执行前其不可被调用
- >> 其调用次数不可超过一次
+- 如果 `onRejected` 是一个函数
+  - 当 `promise` 被拒绝执行后其必须被调用，其第一个参数为`promise`的原因
+  - 当`promise`被拒绝执行前其不可被调用
+  - 其调用次数不可超过一次
 
-> 在执行上下文堆栈仅包含平台代码之前，不得调用`onFulfilled`或`onRejected`
-> `onFulfilled`和`onRejected`必须被作为普通函数调用（即非实例化调用，这样函数内部 this 非严格模式下指向window）
-> then 方法可以被同一个 `promise` 调用多次
- >> 当`promise`成功执行时，所有`onFulfilled`需按照其注册顺序依次回调
- >> 当`promise`被拒绝执行时，所有`onRejected`需按照其注册顺序依次回调
+- 在执行上下文堆栈仅包含平台代码之前，不得调用`onFulfilled`或`onRejected`
+- `onFulfilled`和`onRejected`必须被作为普通函数调用（即非实例化调用，这样函数内部 this 非严格模式下指向window）
+- then 方法可以被同一个 `promise` 调用多次
+  - 当`promise`成功执行时，所有`onFulfilled`需按照其注册顺序依次回调
+  - 当`promise`被拒绝执行时，所有`onRejected`需按照其注册顺序依次回调
 
-> then 方法必须返回一个`promise`对象`promise2 = promise1.then(onFulfilled,onRejected)`
- >> 只要`onFulfilled`或者`onRejected`返回一个值 `x`， promise2都会进入`onFulfilled`状态；
- >> 如果`onFulfilled`或者`onRejected`抛出一个异常 `e`，则promise2必须拒绝执行，并返回拒绝原因`e`
- >> 如果`onFulfilled`不是函数且`promise1`状态变为已完成，`promise2`必须成功执行并返回相同的值
-> > 如果`onRejected`不是函数且`promise1`状态变为已拒绝，`promise2`必须执行拒绝回调并返回相同的拒绝原因
+- then 方法必须返回一个`promise`对象`promise2 = promise1.then(onFulfilled,onRejected)`
+  - 只要`onFulfilled`或者`onRejected`返回一个值 `x`， promise2都会进入`onFulfilled`状态；
+  - 如果`onFulfilled`或者`onRejected`抛出一个异常 `e`，则promise2必须拒绝执行，并返回拒绝原因`e`
+  - 如果`onFulfilled`不是函数且`promise1`状态变为已完成，`promise2`必须成功执行并返回相同的值
+  - 如果`onRejected`不是函数且`promise1`状态变为已拒绝，`promise2`必须执行拒绝回调并返回相同的拒绝原因
 
 ```js
 var promise1 = new Promise((resolve, reject) => {reject()})
@@ -269,11 +269,11 @@ promise.then(function(x){
 })
 ```
 如果`x`有`then`方法且看上去像一个Promise，解决程序即尝试使`promise`接收`x`的状态；否则其用`x`的值来执行`promise`
-> 如果 `promise`为和`x`指向同一个对象，以`TypeError`为拒绝执行`promise`
-> 如果`x`为`promise`
-  >> 如果`x`处于等待状态，`promise`需保持为等待状态直至`x`被执行或拒绝
->  > 如果`x`处于执行状态，用相同的值执行`promise`
->  > 如果`x`处于拒绝状态，用相同的拒绝`promise`
+- 如果 `promise`为和`x`指向同一个对象，以`TypeError`为拒绝执行`promise`
+- 如果`x`为`promise`
+   - 如果`x`处于等待状态，`promise`需保持为等待状态直至`x`被执行或拒绝
+   - 如果`x`处于执行状态，用相同的值执行`promise`
+   - 如果`x`处于拒绝状态，用相同的拒绝`promise`
 
 ```js
 var promise1 = function(){
@@ -297,18 +297,18 @@ promise1().then(function(){
 }, function() {console.log('已拒绝')}
 )
 ```
-> 如果 x 为Object或function（不常见）
-> > 首先尝试执行x.then
-> > 如果取x.then是函数，将x作为函数的作用域this调用。传递两个回调函数作为参数，第一个参数叫做resolvePromise，第二个参数叫做rejectPromise；
-> > 如果then是函数，将x作为函数的作用域this调用。传递两个回调函数作为参数，第一参数叫做resolvePromise，第二个参数叫做rejectPromise；
-> > > 如果 resolvePromise 以值y为参数被调用，则运行`[[Resolve]](promise, y)`
-> > > 如果 rejectPromise 以拒因r为参数被调用，则以拒因r拒绝promise
-> > > 如果 resolvePromise 和 rejectPromise 均被调用，或者被同一参数调用了多次，则优先采用首次调用并忽略其他的调用
-> > > 如果调用then方法抛出了异常e
-> > > > 如果 resolvePromise 或 rejectPromise 已经被调用，则忽略
-> > > > 否则以e为拒因拒绝`promise`
-> > 如果then不为函数，以x为参数将`promise`变为已完成状态
-> 如果x不为对象或者函数，以x参数将`promise`变为已完成状态（重要且常见）
+- 如果 x 为Object或function（不常见）
+  - 首先尝试执行x.then
+  - 如果取x.then是函数，将x作为函数的作用域this调用。传递两个回调函数作为参数，第一个参数叫做resolvePromise，第二个参数叫做rejectPromise；
+  - 如果then是函数，将x作为函数的作用域this调用。传递两个回调函数作为参数，第一参数叫做resolvePromise，第二个参数叫做rejectPromise；
+     - 如果 resolvePromise 以值y为参数被调用，则运行`[[Resolve]](promise, y)`
+     - 如果 rejectPromise 以拒因r为参数被调用，则以拒因r拒绝promise
+     - 如果 resolvePromise 和 rejectPromise 均被调用，或者被同一参数调用了多次，则优先采用首次调用并忽略其他的调用
+     - 如果调用then方法抛出了异常e
+         - 如果 resolvePromise 或 rejectPromise 已经被调用，则忽略
+         - 否则以e为拒因拒绝`promise`
+  - 如果then不为函数，以x为参数将`promise`变为已完成状态
+  - 如果x不为对象或者函数，以x参数将`promise`变为已完成状态（重要且常见）
 
 ## Promise 构造函数上的静态方法
 
