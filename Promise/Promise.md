@@ -349,3 +349,47 @@ Promise.all([promise1(), promise2()]).then(()=>{
     console.log('全部promise均改变')
 })
 ```
+
+## generator / async await 简介
+
+在ES6之后，我们可以使用 generator 和 async/await 来操作promise，比起使用promise串行的调用来说，他们从语法成面让调用关系显得更加串行。
+
+```js
+function promise1(){
+    return new Promise(function(resolve) {
+        setTimeout(function(){
+            console.log(1)
+            resolve()
+        }, 1000)
+    })
+}
+
+function promise2(){
+    return new Promise(function(resolve) {
+        setTimeout(function(){
+            console.log(2)
+            resolve()
+        }, 1000)
+    })
+}
+
+// 使用 generator 函数
+function gen() {
+    yield promise1();
+    yield promise2();
+}
+
+var g = gen()
+g.next()
+g.next()
+
+// 使用 async/await 函数
+(async function() {
+    try {
+        await promise1()
+        await promise2()
+    } catch (e) {
+        console.log(e)
+    }
+})()
+```
