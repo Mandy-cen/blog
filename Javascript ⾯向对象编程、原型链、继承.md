@@ -487,6 +487,84 @@ console.log(Parent.prototype)// Child { eat: [Function], childEat:[Function] }
 可以看到，在给 Child.prototype 添加新的属性或者⽅法后，Parent.prototype 也会随之改变，这可不是我们想看到的。
 
 
+###  相关面试题
+
+#### 1
+```js
+function Person() {
+    this.name = 1;
+    return {};
+}
+var person = new Person();
+console.log('name:', person.name);
+```
+
+#### 2
+```js
+function Person() {
+    this.name = 1;
+}
+Person.prototype = {
+    show: function () {
+        console.log('name is:', this.name);
+    }
+};
+var person = new Person();
+person.show();
+```
+
+#### 3
+```js
+function Person() {
+    this.name = 1;
+}
+Person.prototype = {
+    name: 2,
+    show: function () {
+        console.log('name is:', this.name);
+     }
+};
+
+var person = new Person();
+Person.prototype.show = function () {
+    console.log('new show');
+};
+
+person.show()
+```
+
+#### 4
+```js
+function Person() {
+    this.name = 1;
+}
+Person.prototype = {
+    name: 2,
+    show: function () { console.log('name is:', this.name);}
+};
+
+var person = new Person();
+var person2 = new Person();
+
+person.show = function () { console.log('new show'); };
+person2.show();
+person.show();
+```
+
+#### 5 综合题
+```js
+function Person() { this.name = 1; }
+
+Person.prototype = {
+    name: 2,
+    show: function () { console.log('name is:', this.name);}
+};
+Person.prototype.show();
+
+(new Person()).show();
+```
+
+
 
 
 
