@@ -307,5 +307,25 @@ h1标签
 默认：加粗 块状元素
 字体大小：font-size:2em 未经过调整的浏览器大小是 32px
 
-### 
+### 你知道checkbox有几种状态吗？它们分别用来表示什么？
+```
+checked = true;选中
+checked = false; 未被勾选
+indeterminate = true; 半选钩中
+indeterminate = false; 半选未钩中
+```
+### 怎样去除html标签之间换行产生的空格？
+1.不换行
+2.设置父级font-size为 0
+3.设置换行的标签否定边距margin-left;
+4.选用浮动属性float
+5.利用注释排版
+6.使用返回标签
+
+### 页面布局中的结构与表现分离，那么什么是结构？什么是表现呢？
+
+结构：HTML文件
+表现：Css文件
+行为：JS文件
+是web开发的一种思路这样做便于后期代码的管理、维护
 
