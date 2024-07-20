@@ -610,4 +610,22 @@ fixed：可视窗口viewport本身（属于continuous media类型时）或页面
 cursor是用来显示鼠标不同的光标的
 它的属性主要有auto，move，text，pointer，各种方向的resize，还有放大镜的zoom-in，放小镜的zoom-out等
 
-### 
+###  标签、class和id选择器三者的区别是什么？分别在什么时候用？
+三者的权重不同，都可以作为 CSS 的选择器使用。id > class > tag。
+
+不过在一般的使用中，id 会留给 JavaScript 使用，用来进行 DOM 的操作并且 id 不允许重复。class 和 tag 一般用在 CSS 上，用来进行样式的编辑
+
+### 为什么要使用css sprites？
+减少HTTP请求
+增加图片显示速度
+
+###  Reset CSS和Normalize CSS的区别是什么？
+Reset CSS: 将各个浏览器的默认样式重置
+Normalize CSS: 保留各个浏览器的样式,只是让它们更加统一通用了
+
+### 怎么自定义鼠标指针的图案？
+cursor: url() ,auto
+url是自定义光标图案的绝对路径，auto是默认光标，当我们自定义的光标不起作用时，就用默认光标代替
+
+###  你知道CSS中的字母"C"代表什么吗？
+CSS 层叠样式表 Cascading Style Sheet
