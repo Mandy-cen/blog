@@ -415,3 +415,64 @@ AJAX是用于网页和服务器进行异步通信的技术。
 - 向服务器发送请求（get类型直接发送请求，post类型需要设置请求头）
 - 接收服务器的响应数据（需根据XMLHttpRequest的readyState属性判定调用哪个回调函数）
 - 更新页面
+
+
+### 分别写出防抖和节流的两个函数，并描述它们分别有什么运用场景
+
+```
+type Timeout = number // browser
+// type Timeout = NodeJS.Timeout // node
+
+/**
+ * 防抖：生成一个函数，它在被调用后会等待一段时间再执行。
+ * 如果在等待期间再次调用，之前还未执行的调用会被取消。
+ * @param fn 要防抖的函数
+ * @param timeout 超时时间
+ */
+function debounce(fn: (...args: any[]) => any, timeout: number) {
+    let time: Timeout = null
+    return function _debounced(...args: any[]) {
+        if (time !== null)
+            { clearTimeout(time) }
+        time = setTimeout(() => {
+            fn(...args)
+            time = null
+        }, timeout)
+    }
+}
+
+/**
+ * 节流：生成一个函数，它在被调用后一段时间内再次被调用不起作用。
+ * @param fn 要节流的函数
+ * @param timeout 超时时间
+ */
+function throttle(fn: (...args: any[]) => any, timeout: number) {
+    let time: Timeout = null
+    return function _throttled(...args: any[]) {
+        if (time === null) {
+            fn(...args)
+            time = setTimeout(() => time = null, timeout)
+        }
+    }
+}
+```
+
+ ### 如何使用js来截图？怎样截可见区域和整个页面？
+ ```
+可以基于html2canvas 和 canvas2image 两个第三方类实现截图。
+
+如果打算截取整个页面 可以直接设定
+
+html2canvas(document.body).then(function (canvas) {
+        document.body.appendChild(canvas);
+      });
+如果打算截取可见区域 额外设置一下宽高即可
+
+width: document.documentElement.clientWidth,
+height: document.documentElement.clientHeight,
+y: document.documentElement.scrollTop
+```
+
+### document.write和innerHTML有什么区别？
+document.write 是会对整个页面进行重绘。
+innerHTML则是只对受影响的DOM元素进行重绘
