@@ -629,3 +629,178 @@ url是自定义光标图案的绝对路径，auto是默认光标，当我们自�
 
 ###  你知道CSS中的字母"C"代表什么吗？
 CSS 层叠样式表 Cascading Style Sheet
+
+### 设置字体时为什么建议设置替换字体？
+这是由于网站用户的浏览设备不同，可能并不支持或没有安装你所设置的字体。
+这时候就会自动使用替换字体来对网页进行一个展示。
+设置替换字体可以尽可能保证所有用户的浏览体验。
+
+### 举例说明伪类:nth-child、:first-child与:first-of-type这三者有什么不同？
+:nth-child(n): 选择当前元素的父元素下的第n个子元素（从1开始）
+
+:nth-of-type(n)： 选择当前元素的父元素下的第n个同类型子元素（从1开始）
+
+:first-child: 相当于:nth-child(1)
+
+:first-of-type: 相当于:nth-type(1)
+
+
+### 说说你对min-width和max-width的理解，它们有什么运用场景？
+min-width 最小宽度；
+max-width 最大宽度。
+
+在自适应的布局中用到，当一个dom元素的宽度不确定时，可以设定这个宽度的变化范围。
+
+### 举例说明实现圆角的方式有哪些？
+border-radius
+
+### 有哪些方式可以对一个DOM设置它的CSS样式？
+1.可以使用行内样式
+2.可以使用style标签
+3.可以使用link引入css文件
+4.可以使用js动态修改
+
+### transition、animation、transform三者有什么区别？
+transition 顾名思义,定义过渡动效;一般都是定义某些属性的过渡动效;
+animation: 定义动画,而不是简单的动效了; 必须通过一个 keframe来指定动画过程;
+transform: 不定义任何动效或者动画; 只用来定义"变形"; 可以作为keyframe关键帧的动画效果;
+
+### z-index有时不起作用的原因是什么？怎么解决？
+1、可能是没有设置position
+解决：设置position为relative,absolute,fixed
+2、设置了浮动
+解决：清除浮动
+3、父元素position为relative
+解决：设置为absolute
+
+### 说下background-color:transparent和opacity:0的区别是什么？
+background-color:transparents是将背景设置为透明，而opacity:0但是将整个块都做透明，包括里面的内容
+
+###  word-wrap、word-break和white-space有什么区别？
+word-wrap：现在改为overflow-wrap了；用于控制单词在超出其包裹元素时是否中断单词换行；
+white-space：用于处理元素中的空白符号（包括空格，换行符，制表符，<br>元素，文字自然换行）；
+word-break：用于控制单词在换行时如何断开；
+
+### 说下你对background-size的理解，它有什么运用场景？
+设置背景图的大小，一般用来设置背景图的大小。
+
+###  什么是脱离文档流？有什么办法可以让元素脱离标准的文档流？
+正常文档流是块级元素垂直分布，行内和行内块级是水平分布，脱离文档流就是不按照正常文档流的顺序进行排列。
+设置float、position可以脱离文档流，float是半脱离，元素中的内容仍处于文档流之中，position:absolute和fixed也会使脱离文档流
+
+### 请说说在什么时候用transition？什么时候使用animation？
+transition 相当于是个过度动画，需要又过度效果才会触发。一般用来做元素的放大缩小、平移旋转等简单的操作。transition 只执行一次，当需要执行多次时，一般会利用 :hover 等时机或者使用 javaScript 改变类名进行控制。
+animation 需要自己设定关键帧，可以做相对复杂的操作，比如延迟、循环播放等。一般在需要比较复杂的情况才会使用 animation。
+
+### css中的border:none和border:0px有什么区别？
+从border: 10px;过渡到border: none;，是不会有动画的；
+从border: 10px;过渡到border: 0px;，是可以有动画的。
+
+### 用css怎么实现两端对齐？
+flex 中的justify-context 设置为 space-between
+
+### 请说说你对vh、vw的理解以及它们的运用场景是什么？
+vw: 100vw为视窗的宽度，即1vw是视窗宽度的1%
+vh: 100vh为视窗的高度，即1vh是视窗高度的1%
+运用场景
+图片查看大图：img { max-height: 90vh; }
+代替rem实现移动端布局
+
+### 你有使用过字体图标吗？它有什么好处？
+代替图片，可以减少http请求次数，提高页面加载性能。
+
+### css3和css2的区别是什么？
+css3增加了更多特性：动画、过渡效果，圆角、文字特效等
+
+### 请举例说明css有哪些不可继承的属性？
+1、display：规定元素应该生成的框的类型
+
+2、文本属性：
+
+vertical-align：垂直文本对齐
+
+text-decoration：规定添加到文本的装饰
+
+text-shadow：文本阴影效果
+
+white-space：空白符的处理
+
+unicode-bidi：设置文本的方向
+
+3、盒子模型的属性：width、height、margin 、margin-top、margin-right、margin-bottom、margin-left、border、border-style、border-top-style、border-right-style、border-bottom-style、border-left-style、border-width、border-top-width、border-right-right、border-bottom-width、border-left-width、border-color、border-top-color、border-right-color、border-bottom-color、border-left-color、border-top、border-right、border-bottom、border-left、padding、padding-top、padding-right、padding-bottom、padding-left
+
+4、背景属性：background、background-color、background-image、background-repeat、background-position、background-attachment
+
+5、定位属性：float、clear、position、top、right、bottom、left、min-width、min-height、max-width、max-height、overflow、clip、z-index
+
+6、生成内容属性：content、counter-reset、counter-increment
+
+7、轮廓样式属性：outline-style、outline-width、outline-color、outline
+
+8、页面样式属性：size、page-break-before、page-break-after
+
+9、声音样式属性：pause-before、pause-after、pause、cue-before、cue-after、cue、play-during
+
+### 请使用css画一个圆，方法可以多种
+```
+1.border-radius
+
+.cirlce{
+ width:10vw; height:10vw; background:gray;
+ border-radius:50%;
+}
+2.clip-path
+
+.circle{
+ width:10vw; height:10vw; background:gray;
+ clip-path: circle();
+}
+3.svg background
+
+.circle{
+width:10vw; height:10vw; 
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50%25' cy='50%25' r='50%25' fill='gray'/%3E%3C/svg%3E");
+}
+4.radial-gradient
+
+.circle{
+ width:10vw; height:10vw; 
+ background:radial-gradient(gray 70%, transparent 70%);
+}
+5.font
+
+.circle::after {
+    content: "●";
+    font-size: 10vw;//字体实际大小
+    line-height: 1;
+}
+6.mix-blend-mode
+
+.circle{
+ width: 10vw;height: 10vw;background: gray;
+}
+.circle::after {
+    content: "";display: block;width: 10vw;height: 10vw;
+    mix-blend-mode: lighten;
+    background: radial-gradient(#000 70%, #fff 70%);
+}
+```
+
+### 你知道css的预处理器和后处理器都有哪些吗？它们有什么区别呢？
+目前最主流的 CSS 预处理器：Sass、LESS、Stylus 。
+优缺点
+优点：语言级逻辑处理，动态特性，改善项目结构
+缺点：采用特殊语法，框架耦合度高，复杂度高
+
+后处理器：Rework 、PostCSS、
+优缺点
+优点：使用 CSS 语法，容易进行模块化，贴近 CSS 的未来标准
+缺点：逻辑处理能力有限.
+
+### 怎样去除图片自带的边距？
+display:block
+
+###  height和line-height的区别是什么呢？
+
+height 是元素内容区域高度
+line-height 元素内容行高
