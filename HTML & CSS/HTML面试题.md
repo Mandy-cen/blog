@@ -329,3 +329,164 @@ indeterminate = false; 半选未钩中
 行为：JS文件
 是web开发的一种思路这样做便于后期代码的管理、维护
 
+### 你知道富文本编辑器的实现原理吗？
+`document.execCommand(aCommandName, aShowDefaultUI, aValueArgument)`
+详情可参考 [execCommand](https://developer.mozilla.org/zh-CN/docs/Web/API/Document/execCommand)
+
+### 说说form-data、x-www-form-urlencoded、raw、binary的区别是什么？
+- 同
+发送请求的方式
+
+- 异
+1.multipart/form-data 其请求内容格式为Content-Type: multipart/form-data,用来指定请求内容的数据编码格式，一般用来文件上传。
+2.application/x-www-form-urlencoded 是post的默认格式，使用js中URLencode转码方法。
+3.raw 可上传任意格式的文本，可以上传text、json、xml、html等各种文本类型。
+4.binary 等同于Content-Type:application/octet-stream，只可上传二进制数据。
+
+### 举例说明table怎么合并行和列的？
+跨行合并：rowspan 跨列合并：colspan
+
+### 请说说Canvas和SVG图形的区别是什么？
+Canvas
+依赖分辨率
+不支持事件处理器
+弱的文本渲染能力
+能够以 .png 或 .jpg 格式保存结果图像
+最适合图像密集型的游戏，其中的许多对象会被频繁重绘
+
+SVG
+不依赖分辨率
+支持事件处理器
+最适合带有大型渲染区域的应用程序（比如谷歌地图）
+复杂度高会减慢渲染速度（任何过度使用 DOM 的应用都不快）
+不适合游戏应用
+
+### 精灵图和base64如何选择呢？
+精灵图
+优点：将多个图像加载请求合并为一个请求
+弊端：
+- 难以维护和更新
+- 增加内存消耗
+
+base64
+优点：
+ - 将多个图像加载请求合并为一个CSS文件请求
+ - 轻松更新生成文件
+
+弊端：
+ - base64编码比原始二进制表示大约大25%
+ - IE6或IE7不支持
+
+###  你知道什么是锚点吗？它的作用是什么？怎么创建一个锚点？
+锚点为 HTML 文档中的一个特定的位置。比如小节标题、页首、页尾。锚点可以通过 a 标签来实现。
+
+```
+<!-- href 前一定要加 # 号，这样点击时就会跳转到对应 name 所在的 a 标签位置 -->
+<a href="#anchor">xxx</a>
+
+<!-- 锚点的位置 -->
+<a name="anchor">xxx</a>
+```
+当然，使用 javascript 获取到 DOM 元素之后，也可以根据元素的位置信息，利用 scrollTop 来进行页面位置的跳转。
+
+### table去除边框的方法有哪些？
+border-style: hidden;  
+border: 0; 
+border: hidden; 
+border-width: 0; 
+border: transparent;
+border-color: transparent; (可能不合题"去除"之意，当例外，不过效果最好，因为border其实还在，所以对原有布局无丝毫影响，就只是看不见了)‘
+
+### 说说你对表单属性type="hidden"的理解，它的运用场景有哪些？
+存CSRF token，防止CSRF攻擊
+
+### 本地存储的生命周期是什么？
+cookie: expire 和 max-age 都能控制数据的存储时间。expire 是一个绝对的过期时间，max-age 是文档被访问之后的存活时间（是相对时间）。默认是 session。
+sessionStorage: 当会话被关闭后（浏览器、标签页被关闭），就会被清除。与 localStorage 用法一样。
+localStorage: 除非被主动清除，不然永久储存在浏览器中。
+IndexedDB: 没有过期时间，除非主动清除。
+
+###  input的onblur和onchange事件区别是什么？
+onchange是指值改变并且失去焦点时触发的事件
+onblur失去焦点时就触发，不管值有没有改变
+
+
+### 请说说 `<pre>` 和 `<code>` 标签的区别？
+pre里的内容会保留换行符和空格，code里的不会保留
+
+### 怎样把整个页面中的内容设置成只读，不可编辑的状态？
+1.将所有dom设置为disabled
+2.搞个透明遮罩层，全屏的最上层的div元素
+3.想编辑，先过了我input, onfocus等事件再说
+
+###  HTML5如何使某个页面元素或整个页面可编辑？
+让某个元素可以编辑，可以使用 contenteditable 属性。
+让整个页面可编辑可以使用 document.designMode 属性。
+
+###  HTML5有哪些存储类型？它们之间有什么区别
+cookie: 最大 4k, 基本无兼容问题, 所有同源tab 共享, 每次请求都携带, key-value 存储, value 只存字符串
+sessionStorage 无大小限制, 只在当前 tab 有效, tab 关闭即失效, key-value 存储, value 只存字符串
+localStorage 最大 5M-10M, 所有同源 tab 共享, 能持久化存储, key-value 存储, value 只存字符串
+indexDB key-value 存储,value 可以任意类型, 同源, 支持事务, 最大 250M, 兼容 ie10
+webSQL 支持版本,事务,支持 sql 语句, 不兼容 ie
+
+
+###  HTML5如何调用摄像头？
+window.navigator.getUserMedia()
+然后接收三个参数，第一个是视频或者音频以及分辨率{video:true}
+第二个是成功回调，第三个是失败回调。
+
+还有一种调用
+window.navigator.mediaDevices.getUserMedia()
+也是三个参数，参数格式和上文一样，区别在于这个api是基于promise实现的。
+
+### Shadow DOM和Virtual DOM有什么区别？
+Shadow DOM
+Shadow DOM是浏览器提供的一个可以允许将隐藏的DOM树添加到常规的DOM树中——它以shadow root为起始根节点，在这个根节点的下方，可以是任意元素，和普通的DOM元素一样。
+
+Virtual DOM
+虚拟DOM是由js实现的避免DOM树频繁更新，通过js的对象模拟DOM中的节点，然后通过特定的render方法将它渲染成真实的节点，数据更新时，渲染得到新的 Virtual DOM，与上一次得到的 Virtual DOM 进行 diff，得到所有需要在 DOM 上进行的变更，然后在 patch 过程中应用到 DOM 上实现UI的同步更新。
+
+### 你知道HTML什么是单闭合标签和双闭合标签吗？为何要分为这两种呢
+单标签如<meta />，只需将标签名申明一遍的，按照标准，结尾应该有/
+双标签如<div></div>,标签名需在首位各写一遍
+区别：单标签与双标签都有属性，但是双标签有内容，也就是innerHTML
+常见的单标签：img、imput、br、hr、meta、link...
+
+
+###  HTML的标签区分大小写吗？属性名区分大小写吗？
+
+标签不区分大小写，属性名区分大小写
+
+###  网站首页有大量的图片，加载很慢，要是你，你该怎么去优化呢？
+1 小图用 iconfont（svg）代替。
+2 不能替代的用base64。
+3 去除gif图，用video代替。
+4 工具压缩图片的大小。
+5 优先使用webp格式
+6 骨骼屏+ 懒加载。
+7 雪碧图
+
+### 请使用纯HTML制作一个进度条
+<progress value="70" max="100">70 %</progress>
+
+###  主框架如何与iframe通信？如何解决跨域？
+1.主域相同，子域不同，可以设置在两个页面都设置document.domain = ‘xxx.com’然后,两个文档就可以进行交互。
+2.主域和子域都不同，则可以使用CDM(cross document messaging)进行跨域消息的传递。
+发送消息: 使用postmessage方法
+接受消息: 监听message事件
+
+### 举例说明ul、dl、ol三个标签的区别？
+ul：无序列表。
+dl：定义列表。
+ol：有序列表。
+
+###  说下cookie都有哪些缺点？
+1.存储量限制
+2.容易crsf 攻击
+
+###  你知道p标签和br标签两者的区别是什么吗？
+p 标签是段落与段落之间的换行，相当于 line-height 的两倍
+br 标签是行与行之间的换行
+
+p是双标签，内部可以嵌入内容使用，br是单标签
