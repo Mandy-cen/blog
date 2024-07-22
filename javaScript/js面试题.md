@@ -603,3 +603,6 @@ Property是有可能变化的(跟随用户操作).
 ### 用js实现一个复制粘贴的功能
 obj.select();//通过选中对象再执行复制命令
 document.execCommand("Copy")
+
+###  ajax的请求状态有哪几种？
+<img width="713" alt="image" src="https://github.com/user-attachments/assets/46b66cd2-5689-4a38-8b86-abb2735d4a3e">
