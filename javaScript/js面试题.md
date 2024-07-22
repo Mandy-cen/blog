@@ -1,12 +1,3 @@
-用递归算法实现，数组长度为5且元素的随机数在2-32间不重复的值
-
-[js]
-写一个方法去掉字符串中的空格
-[js]
-去除字符串中最后一个指定的字符
-
-[js]
-写一个方法把下划线命名转成大驼峰命名
 
 
 ### 写一个把字符串大小写切换的方法
@@ -476,3 +467,139 @@ y: document.documentElement.scrollTop
 ### document.write和innerHTML有什么区别？
 document.write 是会对整个页面进行重绘。
 innerHTML则是只对受影响的DOM元素进行重绘
+
+###  如何实现文件拖动上传？
+利用 HTML5 的 drag & drop API 来实现。需要注意的是，必须要设置 dragover 事件，不然不会触发 drop 事件。
+
+###  JavaScript有几种类型值？
+基本类型： string、number、boolean、Undefined、null、Symbol、BigInt
+引用类型：object、array、function
+
+### JSON.stringify有什么局限性和哪些技巧
+会忽略undefined，function，Symbol，不能正确处理NaN，Infinity，循环引用
+
+###  原生的字符串操作方法有哪些？请列举并描述其功能
+str.split() 字符转数组
+str.trim() 去除空格
+str.replace() 内容替换
+str.substr() 字符串截取
+str.slice() 返回区间内字符串
+str.repeat() 重复字符串
+str.substring()
+str.includes() 判断字符串中是否包含该字符
+str.indexOf()
+
+### 请解释下NaN === NaN的结果
+false， NaN不等于任何数包括他自己
+
+### 请描述下ajax的请求都有哪些步骤？
+1.创建XMLHttpRequest
+let xhr=new XMLHttpRequest;
+2.连接服务器
+xhr.open("get","goods.json",true)
+true代表异步，false代表同步。goods.json代表请求的路径
+3.向服务器发送请求
+xhr.send()
+4.接受服务器响应的数据
+
+ajax的作用：向http服务器发送请求，并可以接收到http服务器响应的数据
+
+###  CSS3中的transition是否可以过渡opacity和display？
+transition可以过渡opacity, 但不可过渡display.
+
+一般情况下线性属性如opacity都是可以被transition所过渡的, 非线性或者离散的值如display不可被过渡.
+
+### 自己实现数组的 `map`、`filter`、`find` 方法
+
+```
+map
+
+Array.prototype.newMap = function(fn, context) {
+    let newArr = new Array;
+    if(typeof fn !== "function") {
+        throw new TypeError(fn + "is not a function");
+    }
+    var context = arguments[1];
+    for (var i = 0; i < this.length; i++) {
+        newArr.push(fn.call(context, this[i], i, this))
+    }
+    return newArr
+}
+find
+
+Array.prototype.newFind = function(fn, context) {
+    let str;
+    if(typeof fn !== "function") {
+        throw new TypeError(fn + "is not a function");
+    }
+    var context = arguments[1];
+    for (var i = 0; i < this.length; i++) {
+        if(fn.call(context, this[i], i, this)) {str = this[i];break; }
+    }
+    return str
+}
+filter
+
+Array.prototype.newfilter = function (fn, context) {
+    let newArr = new Array;
+    if (typeof fn !== "function") {
+        throw new TypeError(fn + "is not a function");
+    }
+    var context = arguments[1];
+    for (var i = 0; i < this.length; i++) {
+        if (fn.call(context, this[i], i, this)) { newArr.push(this[i]) }
+    }
+    return newArr
+}
+```
+
+###  请举例说明动态操作DOM的方法有哪些？
+```
+创建一个元素
+
+createElement()
+向元素末尾添加一个子节点
+
+appendChild()
+将新的元素插入到指定元素的前面
+
+insertBefore(new,old);
+删除一个子节点
+removeChild() //接收一个节点类型的；参数是要删除的这个元素；
+替换子节点
+
+replaceChild(new,old); //用新的元素替换原有的元素
+克隆元素
+
+cloneChild()
+//接收一个布尔类型的参数 true,false
+//如果不传参数，默认是false；
+```
+
+### 阻止事件的默认行为有哪些？说说它们之间的区别是什么？
+阻止默认事件：event.preventDefault()
+阻止事件冒泡：event.stopPropation()
+
+### 实现异步编程有哪些方式？推荐用哪种
+1、回调函数
+2、事件监听。事件执行顺序取决于某个事件是否触发
+3、Promise
+4、生成器函数可以实现异步，但是不推荐
+5、async/await 相当于生成器函数的语法糖
+
+推荐使用async/await配合promise
+
+
+### 在js中attribute和property的区别是什么？
+attribute
+
+元素在HTML中的键值对
+attribute 会始终保持 html 代码中的初始值(除了href)
+property
+
+attribute在对应的JS DOM节点上的对象属性
+Property是有可能变化的(跟随用户操作).
+
+### 用js实现一个复制粘贴的功能
+obj.select();//通过选中对象再执行复制命令
+document.execCommand("Copy")
