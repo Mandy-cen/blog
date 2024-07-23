@@ -490,3 +490,167 @@ p 标签是段落与段落之间的换行，相当于 line-height 的两倍
 br 标签是行与行之间的换行
 
 p是双标签，内部可以嵌入内容使用，br是单标签
+
+###  说下你对DOM树的理解
+
+DOM模型不仅描述了文档的结构，还定义了结点对象的行为，利用对象的方法和属性，可以方便地访问、修改、添加和删除DOM树的结点和内容。
+
+元素（element）：文档中的所有标签都是元素，元素可以看成是对象
+节点（node）：文档中都有的内容都是节点：标签，属性，文本
+文档（document）：一个页面就是一个文档
+这三者的关系是：文档包含节点，节点包含元素
+让JavaScript可以对文档中的标签、属性、内容等进行 访增删改 操作。
+
+###  移动端点击300ms的延迟出现的原因是什么？你的解决方案是什么？
+原因：早期IOS为了区分用户是双击缩放还是点击链接行为，于是就有了300ms延迟，其他浏览器就效仿了。
+解决办法：1，引入fastclick，一了百了；2、在meta禁用浏览器缩放；3、touch事件模拟
+
+### 说出至少十条你理解的html规范
+标签名和属性推荐用小写
+标签都需闭合，不管是单标签还是双标签
+双标签不宜使用单标签闭合方式
+属性值需双引号
+img 标签需加上 alt
+img 标签推荐加上固定宽高
+html 和 body 标签最好不好
+部分字符推荐转义，比如 <
+link 写在 head 内，script 写在 body 内最末
+不推荐使用已废弃的标签和属性名，比如 marquee center 等
+
+###  网站的响应式和自适应有什么区别？
+响应式：有多套UI,不同大小的设备加载不同的UI。
+自适应：一套UI,根据屏幕大小缩放尺寸。
+
+###  页面加载后，表单的第一个文本框如何自动获得焦点？
+1、
+`<input type="text" autofocus/>`
+2、
+```
+<input id="input" type="text"/>
+document.getElementById('input').focus();
+```
+
+### 请解释下href="javascript:void(0)"和href="#"的区别是什么？
+一个是执行函数，一个是跳转链接，执行函数的可以return一个false 使跳转或者其他事件被阻止
+
+###  如何防止cookie被盗用？
+禁止第三方网站带cookie(same-site属性)
+每次请求需要输入图形验证码
+使用Token验证
+为cookie设置HttpOnly
+设置CSP
+使用Referer验证
+禁止网页内嵌
+使用https
+cookie带上用户ip加密
+
+### 如何能防止网页禁止被iframe嵌入呢？
+```
+if(self != top) { 
+    top.location = self.location
+ }
+```
+
+### 怎么让table的thead 不动，tbody出现滚动条呢？
+position: sticky;
+
+###  移动端如何禁止用户手动缩放页面？
+user-scalable=no
+`<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">`
+
+###  img中的src加载失败时如何用默认图片来替换呢？
+img有onerror属性，加载失败时触发error事件
+但是这种解决方法在error里面替换的默认图片也加载失败的时候会导致问题，需要注意
+
+### 怎样使用iframe刷新父级页面？
+parent.location.reload();
+
+### 如何使用html5进行图片压缩上传？
+1.获取到图片的base64格式；
+2.图片加载完成后，把图片转化为canvas；
+3.使用canvas的toDataURL按照自己的需要进行压缩；
+4.把dataURL转化成blob对象；
+5.把blob对象转化成formData对象，最后按照ajax接口调用方式提交；
+
+### 举例说明Shadow DOM的应用场景有哪些？
+可以将 shadow DOM 视为“DOM中的DOM”。它是自己独立的DOM树，具有自己的元素和样式，与原始DOM完全隔离。
+
+### 给一个元素加下划线的方法有哪些？
+使用 <u></u> 标签
+给元素添加 boder-bottom
+文字样式 text-decoration: underline;
+使用伪类或者子元素做绝对定位
+
+### innerHTML与outerHTML有什么区别？
+innerHTML获取的是对应id里面的html字符串，而outerHTML获取的是对应id包括子节点的html字符串。
+
+###  history和hash两种路由方式的最大区别是什么？
+#Hash模式：由于 hash 发生变化的url都会被浏览器记录下来，所以浏览器的前进后退可以使用，hash值不会带给服务器，使用 hashchange 事件来监听 hash 值的变化
+
+History模式：页面刷新的时候不重新加载数据，需要服务器配合，pushState（新增一个历史记录） 和 repalceState（替换当前历史记录） 两个 API 来操作实现 URL 的变化
+
+
+###  举例说明图片懒加载的方案有哪些？
+利用 getBoundingClientRect() 这个 API 获取图片元素相对于视口的位置，来判断是否需要加载图片
+
+利用 IntersectionObserverEntry接口 获取目标元素与容器的相交状态
+
+### DOM节点的种类有哪些？
+元素类型，文本类型，doctype类型，document类型，documentfragment类型
+
+###  如何让table的边框双线变单线？
+border-collapse：属性，为表格设置合并边框模型。
+
+### websocket和http有什么区别？
+WebSocket是双向的，在客户端-服务器通信的场景中使用的全双工协议，与HTTP不同，它以ws://或wss://开头。
+HTTP是单向的，客户端发送请求，服务器发送响应。
+
+###  websocket和socket有什么区别？
+1.Socket 是传输控制层的接口。用户可以通过 Socket 来操作底层 TCP/IP 协议族通信。
+2.WebSocket 是一个完整应用层协议。
+3.Socket 更灵活，WebSocket 更易用。
+4.两者都能做即时通讯
+
+###  websocket是如何做心跳检测、数据加密、身份验证的？
+？？？？
+
+### websocket握手成功会返回一个干什么状态吗？是200吗？
+WebSocket protocol 是HTML5一种新的协议。它实现了浏览器与服务器全双工通信(full-duplex)。在握手阶段借用http协议传输，建立连接后采用TCP协议传输。
+
+101状态码：切换协议 请求者已要求服务器切换协议，服务器已确认并准备切换
+
+握手阶段websocket利用http进行传输，握手成功后，返回状态码101 告知浏览器，服务器已确认并准备切换协议
+
+###  websocket如何区分不同的客户端？
+？？
+
+###  跨标签页的通讯方式有哪些
+localStorage
+
+WebSocket
+
+###  页面刷新时sessionStroage会变（会清空）吗？
+不会，session means 会话，reload并不会开启新的会话，除非window关闭，再开启。
+
+###  前端需要注意哪些SEO?
+合理的title，description，keyswords 搜索引擎对这三项的权重逐个减小，title 值强调重点即可，重要的关键
+词出现不要超过两次，而且要靠前。
+
+2 、不同页面的tilte要有所不同；description把页面的内容高度概括，长度合适，不可过分堆叠关键词，不同页面
+
+description有所不同。keyswords列举出重要的关键词即可。
+
+3、语义化的HTML代码，符合W3C 规范：语义化代码有利于搜索引擎理解网页。
+
+4 、重要的内容HTML代码放在前面：搜索引擎抓取HTML 的顺序是从上到下，有的搜索引擎对抓取长度有限制，保
+
+证重要内容一定会被抓取。
+
+5 、重要的内容不要用js输出，爬虫不会执行js获取内容。
+
+6 、尽量少用iframe ，搜索引擎不会抓取iframe中的内容。
+
+7 、非装饰的图片必须加alt 。
+
+8 、提高网站速度：网站速度是搜索引擎排序的一个重要指标。
+
