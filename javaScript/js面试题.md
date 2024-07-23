@@ -606,3 +606,176 @@ document.execCommand("Copy")
 
 ###  ajax的请求状态有哪几种？
 <img width="713" alt="image" src="https://github.com/user-attachments/assets/46b66cd2-5689-4a38-8b86-abb2735d4a3e">
+
+###  getElementById和querySelector方法的区别是什么？
+getElementById 传入的值是dom的id
+querySelector 传入的值 #id, .class, tag。。。,且命中第一个元素.
+
+### 用原生js获取DOM元素的方法有哪些
+getElementById
+getElementByName --通过name属性
+getElementByClassName
+getElementByTagName
+querySelector
+querySelectorAll
+document.documentElement ---获取html
+document.body ---获取body
+
+###  js如何实现打印指定的区域（局部打印）？
+var dom = document.getElementById('div1');
+var win = window.open('');
+win.document.write(dom.outerHTML);
+win.print();
+win.close();
+
+### 写一个网络不通时则提醒用户的方法
+```
+window.addEventListener('online',function(){
+alert('online now');
+});
+
+window.addEventListener('offline',function(){
+alert('offline now');
+});
+```
+
+###  js垃圾回收的方式有哪些？
+1、标记清除
+2、引用计数
+
+### 异步加载和延迟加载有什么区别？
+异步加载：async
+浏览器会在解析HTML的同时进行加载javascript，一旦该javascript加载完毕，浏览器会暂停HTML的加载并执行javascript，之后继续HTML的加载。
+
+延迟加载： defer
+同样是解析HTML的同时进行加载javascript，但是浏览器会等待HTML全部解析完毕后再进行执行已加载的javascript。
+
+
+### 解释下offsetWidth、clientWidth、scrollWidth这三者的区别是什么
+offsetWidth 是对象的实际宽度,边框，滚动条宽度
+clientWidth是对象的整体宽度，不包含边框和滚动条
+scrollWidth是对象的实际宽度，不包含边框和滚动条
+
+### 说出至少十条你理解的js规范
+1.尽量使用const去定义常量，且采用大写加_，如 MAX_COUNT = 10
+2.尽量写代码注释；
+3.try catch不确定的代码块；
+4.Promise的reject处理；
+5.及时清理不用的变量、定时器；
+6.switch 语句应使用break中断，而不是return；
+7.命名语义化；
+8.尽量减少对闭包的使用
+9.尽可能使用if判断做容错处理；
+10.尽量避免使用内置方法或属性名字去定义，如var self = this;
+
+###  举例说明这三种方法map、reduce和filter的区别是什么？
+map: 遍历数组，执行回调，返回一个新数组
+[2, 3, 4].map( a => a + 2) // 6,5,6
+reduce: 方法对数组中的每个元素按序执行一个由您提供的 reducer 函数，每一次运行 reducer 会将先前元素的计算结果作为参数传入，最后将其结果汇总为单个返回值。
+[2,3,4].reduce((a, b) => a + b, 10) // 19
+filter: 过滤数组，返回满足条件的元素并返回一个新数组
+[2,3,4].filter(a => a > 2) // 3,4
+
+###  说说js跳出循环return、break、continue的区别？
+return 是结束循环，并且返回一个值
+break 是跳出当前的循环体，
+coninue 是跳出当前这一次的循环，并接着循环
+
+###  js事件中currentTarget和target的区别是什么
+Event 接口的只读属性 currentTarget 表示的，标识是当事件沿着 DOM 触发时事件的当前目标。它总是指向事件绑定的元素，而 Event.target 则是事件触发的元素。
+
+### 请比较下for、forEach、for of的性能的性能
+1.for 最好
+2.forEach与for of 相差无几 平均测试下来forEach略高for of
+3.forEach 无法通过 break跳出 for of内存占用上有一定的优势
+
+### 微任务和宏任务有什么区别？
+宏任务：script整体代码、setTimeout、setInterval...
+微任务：Promise.then、Object.observe、process.nextTick...
+运行机制：当前宏任务执行结束 -> 是否有微任务 --> 执行当前微任务 --> 执行下一个宏任务
+
+### 举例说明object.freeze有哪些用途呢？
+Object.freeze() 方法可以冻结一个对象或数组。 可以提升性能。
+它和const 完全不同
+
+### 页面上的DOM有多个相同的ID，用js获取时结果会是怎么样的？
+只能获取第一个id的dom。
+想要获取全部id相同的dom可以用document.querySelectorAll()
+
+###  setTimeout和setInterval有什么区别呢？
+setTimeout 只执行一次，setInterval 没有终止会一直执行
+
+###  axios为什么能在浏览器中环境运行又能在node中环境运行？
+axios的getDefaultAdapter函数可以判断当前环境，浏览器环境会require一个js文件，node环境会require另一个js文件，前者是用promise管控的xhr一套流程，后者是用node的http库发起http请求。
+
+ ### axios相比原生ajax的优点有哪些呢？
+ 从 node.js 创建 http 请求
+在浏览器中创建 XMLHttpRequests
+支持 Promise API
+提供了一些并发请求的接口（重要，方便了很多的操作）
+支持拦截请求和响应
+转换请求和响应数据
+取消请求
+自动转换 JSON 数据
+客户端支持防止CSRF
+客户端支持防御 XSS
+
+###  在axios中怎样添加授权验证？
+可以在headers请求头里添加token
+config.headers['Authorization'] = 'Bearer ' + token
+
+###  Math.ceil()、Math.round()、Math.floor()三者的区别是什么？
+上取整 四舍五入 下取整
+
+### localStorage什么时候过期？
+localStorage的存储默认不会过期的，需要手动清理或者清除浏览器的缓存
+也可以在缓存数据时设置过期时间
+
+###  fetch和axios请求的原理都是基于XMLHttpRerequst吗？
+axios基于XMLHttpRequest封闭
+fetch 是html5原生对象
+
+###  使用delete删除数组，其长度会改变吗？
+不会
+
+### 内存泄漏和内存溢出有什么区别
+内存泄漏是分配的内存无法释放，导致一直占用内存空间，最终可能引发内存溢出
+内存溢出是申请或使用内存超出可以分配的内存时(例如往一个整形空间存放长整形的数据)
+
+###  js源代码压缩都有哪些方法？它们的压缩原理分别是什么？
+方法
+1.在线工具
+2.webpack
+
+原理
+1.删除注释
+2.变量名方法名字符精减
+
+###  ajax如何接收后台传来的图片？
+1.设置responseType为 Blob，2.将Blob保存为文件
+
+### 说说防止重复发送ajax请求的方法有哪些？各自有什么优缺点？
+防抖法：在一段时间内重复请求，则取消本次请求
+节流法：在一段时间内只能请求一次，下次请求必须在前一次请求完成后
+等值法:未完成请求状态不再请求，而是完成后直接返回相同的内容
+
+### 如何避免JS浮点运算的精度问题（例：0.1+0.7=0.7999999999999999）
+可以利用Number.toLocaleString，默认最多保留3位有效小数
+
+###  js中的undefined和 ReferenceError: xxx is not defined 有什么区别？
+undefined是变量申明未赋值的初始值
+ReferenceError: xxx is not defined是为声明变量的报错信息
+
+### 为什么jsonp不支持post的方法？
+jsonp是跨域解决方案的其中一种方式，依赖script来突破同源策略的限制，而script是通过get方式拉取资源的。
+
+
+###  promise有哪几种状态？是如何变化的？
+1.pending(初始状态)
+2.调用resolve（成功），pending->fulfilled
+3.调用reject（失败），pending->rejected
+而且状态改变以后，就不能在变了
+
+
+
+
