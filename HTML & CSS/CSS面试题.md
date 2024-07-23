@@ -793,3 +793,180 @@ display:block
 
 height 是元素内容区域高度
 line-height 元素内容行高
+
+### 当全国哀悼日时，怎么让整个网站变成灰色呢？
+```
+body{
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+}
+
+/* OR */
+
+body{
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+}
+```
+
+### 怎样用纯CSS实现禁止鼠标点击事件？
+
+pointer-events: none;
+是css3新出现的属性，意思就是禁止鼠标点击事件，当元素中有这一属性时，链接、点击事件统统失效。
+
+###  请写出:link、:visited、:hover、:active的执行顺序
+a标签伪类 正确的顺序 是：lvha(:link--:visited--:hover--:active)
+
+### 举例说明clear取值有哪些？
+none 默认值。允许浮动元素出现在两侧。
+left 在左侧不允许浮动元素。
+right 在右侧不允许浮动元素。
+both 在左右两侧均不允许浮动元素。
+inherit 从父元素继承 clear 属性的值。
+
+### 举例说明常用的cursor取值有哪些？
+1、cursor: move; (移动)
+2、cursor: pointer;(手型)
+3、cursor: not-allowed;(禁用)
+
+### 你有用过vw布局吗？和使用rem有什么区别？
+vw/vh 是屏幕视图的百分比，
+rem 是根据 html的font-size 来设置的相对值。
+
+### 怎么使图片宽度自适应呢？
+object-fit: contain;
+
+### 举例说明:not()的使用场景有哪些
+:not 伪类，匹配到不符合条件一组选择器
+
+###  在css中为什么说不建议使用@import？
+只能导入css文件，需要等页面加载完成后才会加载，不兼容ie5以下，不能通过操作dom.改变样式
+
+### css中class和id选择器有什么区别？
+id 在部分浏览器的 js 中会直接生成同名变量；
+id 的唯一性，获取该 id 的 dom 时，会取同名 id 的前者；
+id 层叠权重非常高，1000 个 class 也覆盖不了 id 的样式；
+class 可以用空格给同个元素设置多个 class，id 用空格会让 id 失效；
+id 可以和链接锚点一起玩耍。
+
+###  使用rem时应该注意什么？
+em 是相对元素本身的 font-size 的相对单位，比如元素本身的 font-size 是 14px，那么 1.2em = 1.2 * 14px = 16.8px。注意，是相对元素本身的 font-size，会随着元素的 font-size 的改变而改变。
+
+rem 是 root em 的缩写，相对根元素的 font-size 相对单位，比如根元素的 font-size 是 14px，那么 1.2rem = 1.2 * 14px = 16.8px。注意，是相对根元素的 font-size，不论元素处于什么位置，乘法的基数都是 14px(根元素的 font-size)。
+
+em 一半用于设置元素的 padding, margin, border-radius 等。
+rem 一半用于设置元素的 font-size。
+px 一半用于设置 border。
+
+###  rem是如何实现自适应布局的？
+
+通过根元素设置font-size
+
+### 头部设置meta也可以做到自适应为啥还要用rem？
+虽然使用meta标签中的viewport可以帮助网页在移动设备上进行自适应布局，但是使用rem作为网页中的长度单位可以更好地控制页面元素的相对大小。
+
+###  说说display:none和visibility:hidden的区别
+显示方式：display: none 会完全移除元素，并且元素不再占据页面布局中的位置，也不会响应用户的事件；而 visibility: hidden 则只是将元素隐藏，元素仍然占据布局空间，而且会响应用户的事件。
+
+计算方式：display: none 会使元素及其所有子元素的计算样式（如宽度、高度、边距、内边距等）失效，如果后面通过 JavaScript 重新将其显示出来，需要重新计算样式；而 visibility: hidden 不会影响元素及其子元素的计算样式，因此重新显示元素时不需要重新计算样式。
+
+性能影响：display: none 比 visibility: hidden 的性能更好，因为它会将元素从渲染树中完全移除，减少了浏览器的工作量；而 visibility: hidden 则会在渲染树中保留元素的占位，增加了浏览器的工作量，尤其是对于复杂的页面或元素较多的情况下。
+
+因此，如果需要完全移除元素，或者需要在元素隐藏时让其不占据布局空间，可以使用 display: none；如果只需要隐藏元素而不影响布局，可以使用 visibility: hidden。
+
+### 分析比较opacity: 0、visibility: hidden、display: none三者的优劣和适用场景
+
+opacity=0，元素隐藏，但不会改变页面布局，能触发点击事件的
+visibility=hidden，元素隐藏，但不会改变页面布局，但是不会触发该元素已经绑定的事件
+display:none,动态创建和销毁元素，会改变页面布局且忽略掉该元素的权重
+
+###  你对伪类了解多少？分为几大类？
+CSS伪类分为四类：
+
+链接伪类：用于设置链接的不同状态下的样式，包括:link、:visited、:hover和:active。
+
+动态伪类：用于根据元素的动态状态设置样式，包括:hover、:focus、:checked、:disabled等。
+
+结构伪类：根据元素在DOM树中的位置选择元素，包括:first-child、:last-child、:nth-child等。
+
+###  为什么要使用sass/less？
+使用Sass/Less可以提高CSS代码的可读性、可维护性、可扩展性，减少重复代码，同时可以使开发更加高效。
+
+### 你认为sass和less的最大区别是什么呢？你喜欢哪个？为什么？
+less 没有循环只有递归；
+less 没有 if 只有 when；
+sass 多个 @function 很棒，否则只能堆变量了；
+less 拼接类名的字符串需加上 ~；
+应该还有很多内置方法的不同，但现在还没用到。
+
+其实我更青睐 stylus，写 flex: left center 这种自定义属性，很简便很舒服，
+但这种肯定会被加到全局里，多人合作时就很怕有人会乱玩了。所以用的最多的还是 sass。
+
+另外，不用 mixin 会造成很多废代码，而 scss 需要加 @include some($x) 才行，
+这个时候就觉得 less 很舒服了，.some(@x) 就行。
+但是吧，less 的递归和条件玩起来真的不舒服，所以还是选了 sass。
+
+### 你有用过sass中的Mixin功能吗？它有哪些作用？
+1.混合用法
+2.函数用法
+```
+1. @mixin ellipsis-one {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+ .test {
+   @inculde ellipsis-one;
+ }
+
+2. @mixin hoverColor ($color, $deepColor) {
+    color: $color;
+    cursor: pointer;
+    &:hover {
+       color: $deepColor;
+   }
+}
+.test {
+ @inculde hoverColor(#555, #333);
+}
+```
+
+###  css的加载会阻塞DOM树解析和渲染吗？为什么？
+css的加载不会阻止DOM树的解析
+css的加载会阻止DOM树的渲染，因为css的下载完成后解析成CSSOM与DOM生成渲染树后，页面才会渲染，绘制出来
+
+###  如何重写行内样式？方法有哪些（至少两种）？
+1, !important 最高级
+2, var divStyle = document.querySelector('#div').style;  修改属性
+
+###  有哪些标签是不支持伪元素的
+input
+select
+img
+单标签不支持伪元素
+
+###  请问class与[class=xxx]的区别是什么？两者是否等价？
+不等价
+class是类选择器，可以作用于任何dom元素
+[class=xxx]是属性选择器 只能作用于特定类型的dom元素
+
+###  使用css实现一个loading的效果
+
+使用@Keyframes 结合 animation实现
+
+###  使用css如何设置背景虚化？
+filter: blur(5px);
+
+###  BFC与IFC有什么区别？
+BFC:针对块元素
+IFC:针对行内元素
+
+### 请说说css的三大特性是什么
+层叠性
+继承性
+优先级
+
+###  css如何去掉i标签默认的斜体？
+font-style: normal;
+
+
