@@ -776,6 +776,165 @@ jsonp是跨域解决方案的其中一种方式，依赖script来突破同源策
 3.调用reject（失败），pending->rejected
 而且状态改变以后，就不能在变了
 
+### 写一个方法，实现修改当前的URL链接但页面不跳转的功能
+window.history.pushState("", "", "/test");
+
+### 写个方法将base64的数据流装换为二进制流
+```
+/**
+
+Base64字符串转二进制流
+@param {String} dataurl Base64字符串(字符串包含Data URI scheme，例如：data:image/png;base64, )
+/
+function dataURLtoBlob(dataurl) {
+var arr = dataurl.split(","),
+mime = arr[0].match(/:(.?);/)[1],
+bstr = atob(arr[1]),
+n = bstr.length,
+u8arr = new Uint8Array(n);
+while (n--) {
+u8arr[n] = bstr.charCodeAt(n);
+}
+return new Blob([u8arr], {
+type: mime,
+});
+}
+let dataurl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAAGElEQVQIW2P4DwcMDAxAfBvMAhEQMYgcACEHG8ELxtbPAAAAAElFTkSuQmCC';
+let blob = dataURLtoBlob(dataurl);
+```
+
+###  请说说html、body、document、window四者的区别是什么？
+html
+有多重意义，既是超文本标记语言，也是 HTML 文档的根元素，其他元素都是其子元素。
+
+body
+body 元素包含了文档的可见内容，HTML 文档最终显示的内容都是其子元素。document.body 可以直接访问此元素。
+
+document
+document 对象是 window 的子属性，用来访问页面中的元素，保存着操作 DOM 的 API。
+
+window
+window 对象在文档打开时自动创建，保存着 DOM，BOM，核心JS 等所有内容。
+对于客户端 JS 而言，window 对象是其全局对象，通过访问 window 对象提供的客户端 API 操作DOM，发起网络请求，进行本地存储，开启定时器，获取浏览器信息等各种能力。
+
+### 解释下什么是暂时性死区？
+如果用ES6新出的语法let和const，这些命令声明的变量，从一开始就形成了封闭作用域。凡是在声明之前就使用这些变量，就会报错。总之，在代码块内，使用let命令声明变量之前，该变量都是不可用的。这在语法上，称为“暂时性死区
+例子：
+console.log(a); // ReferenceError
+let a; // 声明前获取就会报错
+
+###  Promise和setTimeout执行先后有什么区别？
+Promise 和 setTimeout 都是异步代码。JS会先执行同步代码，待主线程清空后开始轮询任务队列的异步任务。
+
+Promise 开启的异步任务在 resolve / reject 后推入到微任务队列，setTimeout 开启的异步任务会在计时结束后推入到宏任务队列。
+
+轮询时会先将微任务队列中的待执行任务推入到主线程中执行。微任务队列清空后将宏任务队列的任务推入到主线程执行。
+
+###  setTimeout(fn,0)，延迟执行吗？
+会延迟
+
+js是单线程的，所有任务按照任务队列（evenLoop ）顺序执行。
+任务队列分为宏任务队列（macrotask）和微任务队列（microtask）
+
+evenLoop 的执行顺序：script主线程任务（属于宏任务）-> 微任务（microtask）-> 下一个宏任务（macrotask）
+setTimeout 属于宏任务
+setTimeout(fn,0)的含义是，指定某个任务在主线程最早可得的空闲时间执行，也就是说，尽可能早得执行
+HTML5标准规定了setTimeout()的第二个参数的最小值（最短间隔），不得低于4毫秒，如果低于这个值，就会自动增加
+
+## js的作用域有哪些？
+ES5中：全局变量和局部变量
+ES6中：块级作用域
+
+### 哪些场景下会使用闭包？
+
+1.封装私有变量
+2.setTimeout
+3.函数防抖
+
+###  Number.isNaN和isNaN有什么区别？
+参照ECMA-262：
+isNaN(number)：
+
+let num = ToNumber(number);
+如果num为NaN，返回true；
+返回false；
+Number.isNaN(number):
+
+先判断number是否为数字类型，如果不是，直接返回false；
+如果number为NaN,返回true；
+否则返回false。
+
+###  写一个方法获取文件的扩展名
+```
+function getFileExtension(filename) {
+  const ex = filename.match(/(?<=\.)\w+$/);
+  return ex && ex[0];
+}
+```
+### []和{}的toString和valueOf的结果分别是什么？
+[]的原型上方法：Array.prototype.toString() ,执行[].toString当然返回js内置的这个函数了，[].toString()返回函数返回值'';
+{}的原型上方法：Object.prototype.toString(),执行({}).toString返回js内置的这个函数,({}).toString()返回"[object Object]"，等价于
+Object.prototype.toString.call({}) ；
+valueOf是Object基类原型上的方法：Object.prototype.valueOf,执行[].valueOf()即找到Object.prototype.valueOf执行，返回[];
+({}).valueOf()同理返回{}
+
+### 不安全的JSON值有哪些？
+function，undefined，symbol，循环使用的对象
+
+###  RegExp如何做到不区分大小写？
+字面量 /a/i;构造函数 new RegExp('a','i')
+
+### 写一个方法将时间戳转换为指定的时间格式
+```
+比如把时间戳date = '1536714683' 转化为字符串为 '2018-09-12 09:11:23'
+
+formatDateTime(date) {
+if (date instanceof Date) {
+let year = date.getFullYear()
+let month = date.getMonth() + 1
+let day = date.getDate()
+let hour = date.getHours()
+let minute = date.getMinutes()
+let second = date.getSeconds()
+month = month > 9 ? month : '0' + month
+day = day > 9 ? day : '0' + day
+hour = hour > 9 ? hour : '0' + hour
+minute = minute > 9 ? minute : '0' + minute
+second = second > 9 ? second : '0' + second
+return ( year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second )
+}
+return null
+}
+可以用以下函数formatDateTime（'1536714683'） = '2018-09-12 09:11:23'
+```
+
+### 当页面刷新时，JS请求哪些地方有缓存处理？
+浏览器缓存，cdn缓存，dns缓存
+
+### 请描述下js中click和onclick的区别？
+1.onclick是绑定事件,告诉浏览器在鼠标点击时候要做什么
+2.click本身是方法,作用是触发onclick事件,只要执行了元素的click()方法,就会触发onclick事件
+
+###  js中splice()和slice()方法有什么区别？
+两者都可以删除数组的某一部分；
+splice 会改变原数组，并且除去删除之外，还可以添加
+slice 不会改变原数组， slice(start,end) 包括start，不包括end
+
+### 为什么会有同源策略？
+主要是为了保护用户数据安全，体现在以下方面
+
+1.为了防止恶意网页可以获取其他网站的本地数据。
+2.为了防止恶意网站iframe其他网站的时候，获取数据。
+3.为了防止恶意网站在自已网站有访问其他网站的权利，以免通过cookie免登，拿到数据。
+
+###  为什么会有宏任务和微任务之分？
+
+????
+
+###  Object.defineProperty 和ES6中的Proxy有什么区别？
+defineProperty 会对原数据造成改变，而 proxy 相当于对原数据的代理不会改变元数据
+proxy 会自动监听数组长度的变化和对象属性的添加
+proxy 监听整个对象，defineProperty 只能监听对象内的属性
 
 
 
