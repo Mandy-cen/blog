@@ -969,4 +969,46 @@ IFC:针对行内元素
 ###  css如何去掉i标签默认的斜体？
 font-style: normal;
 
+### 在Less中怎样使用变量？如何定义？
+```
+@link-color: #ccc;
+p {
+color: @link-color;
+}
+```
 
+### 写的css样式是否能被js所读到？如果可以如何读取？
+```
+element.style
+获取内联样式（感觉没啥大用）
+可读可写。因此可为元素设置新属性（很好）
+
+element.currentStyle
+兼容性差，IE支持，（pass 吧）
+可获取元素当前样式
+
+window. getComputedStyle(element, null)
+可获取元素当前样式（很强）
+兼容性好
+
+element.getBoundClientRect()
+获取元素相对视窗的位置信息（强）
+兼容性好
+```
+
+###  rem和px的换算规则是怎样的？
+rem为相对于根元素字体大小计算倍数，1rem等于一倍html下定义字体大小
+em相对父元素字体大小计算
+
+###  CSS如何将彩色图片变为黑白图片？
+```
+img {
+    filter: grayscale(100%)
+}
+```
+
+###  z-index默认值为多少呢？
+默认值为auto，堆叠顺序与父元素相等。
+
+### 如何使用css实现背景虚化？
+filter: blur(10px) //模糊度自己设置
