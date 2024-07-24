@@ -654,3 +654,61 @@ description有所不同。keyswords列举出重要的关键词即可。
 
 8 、提高网站速度：网站速度是搜索引擎排序的一个重要指标。
 
+### 移动端布局的自适应如何做？
+flex和rem
+
+### 写一个滚动吸顶的布局
+```
+position: sticky;
+top:20px；
+```
+
+### h5页面如何传递参数给小程序？
+```
+1、H5页面
+
+<script src="${base}/resources/common/js/jweixin.miniProgram.js"></script>
+wx.miniProgram.postMessage({
+data: {
+shareUrl:href
+}
+});
+
+注意：传参必须使用data
+
+2、小程序页面接收
+
+Page({
+//获取H5传给小程序的参数
+getMessage: function(e) {
+if (!e.detail) {
+return
+}
+var datas = e.detail.data
+var shareUrl = datas.shareUrl;
+}
+})
+
+index.wxml文件
+```
+
+###  什么是本地存储的有效期？
+本地存储的四种方式：cookie，localStorage, sessionStorage, indexDB
+cookie: 通过 expires / max-age 设置过期时间。如不指定，则为 session cookie, 即一次会话有效。
+localStorage: 持久存储，需主动清除
+sessionStorage: 会话存储，会话结束（浏览器，标签页关闭）自动清除。
+indexDB: 持久存储，需主动删除。
+
+### 如何在不同的端口间共享cookie？
+根据同源策略，cookie是区分端口的，但是浏览器实现来说，“cookie区分域，而不区分端口，也就是说，同一个ip下的多个端口下的cookie是共享的。
+
+###  页面的重绘和回流是什么？
+回流： 当节点发生改变时，浏览器重新渲染部分节点或者全部文档，这个过程为回流。
+重绘： 当操作的节点并不导致元素位置发生变化时，如 color background-color 等，浏览器会将新的样式赋值给这些节点，这个过程为重绘。
+简单理解会引起元素位置变化的就会 reflow，只是在以前的位置进行改变背景颜色等，只会 repaint
+
+### 实现左中右三栏布局有哪些方法？
+
+1、flex布局：父盒子display:flex，左右盒子宽度写死，中间设置flex:1
+2、左右两边的盒子分别左右浮动，中间自适应（设置margin或calc）
+
