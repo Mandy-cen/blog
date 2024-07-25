@@ -936,5 +936,5 @@ defineProperty 会对原数据造成改变，而 proxy 相当于对原数据的�
 proxy 会自动监听数组长度的变化和对象属性的添加
 proxy 监听整个对象，defineProperty 只能监听对象内的属性
 
-
+### 当使用过vue写代码，你还想着用jquery吗？为什么？它俩有什么区别？
 
